@@ -20,9 +20,7 @@ class SitterManagerTests(TestCase):
 
         expected_count = 100
         self.assertEqual(User.objects.count(), expected_count)
-        self.assertEqual(
-            User.objects.filter(email__isnull=False).count(), expected_count,
-            'all Users should have an email')
+        self.assertEqual(User.objects.filter(email__isnull=True).count(), 0)
         self.assertEqual(Sitter.objects.count(), expected_count)
 
 
@@ -45,11 +43,9 @@ class OwnerManagerTests(TestCase):
 
         Owner.objects.populate()
 
-        expected_count = 186
+        expected_count = 189
         self.assertEqual(User.objects.count(), expected_count)
-        self.assertEqual(
-            User.objects.filter(email__isnull=False).count(), expected_count,
-            'all Users should have an email')
+        self.assertEqual(User.objects.filter(email__isnull=True).count(), 0)
         self.assertEqual(Owner.objects.count(), expected_count)
 
 

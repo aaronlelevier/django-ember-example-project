@@ -28,8 +28,8 @@ class RawReviewManager(models.Manager):
         sitters = {sitter.user.username: sitter for sitter in Sitter.objects.all()}
         
         for r in self.all():
-            setattr(r, 'owner_object', owners[r.owner])
-            setattr(r, 'sitter_object', sitters[r.sitter])
+            setattr(r, 'owner_object', owners[r.owner_email])
+            setattr(r, 'sitter_object', sitters[r.sitter_email])
             r.save()
 
 

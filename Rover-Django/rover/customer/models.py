@@ -6,6 +6,7 @@ from util.models import AbstractModel
 
 
 class AbstractCustomer(AbstractModel):
+    name = models.CharField(max_length=50)
     image = models.URLField()
     phone_number = models.CharField(max_length=12)
 
@@ -18,15 +19,16 @@ class SitterManager(models.Manager):
     def populate(self):
         for r in RawReview.objects.all():
             try:
-                user = User.objects.get(username=r.sitter)
+                user = User.objects.get(username=r.sitter_email)
             except User.DoesNotExist:
                 user = User.objects.create_user(
-                    username=r.sitter, email=r.sitter_email)
+                    username=r.sitter_email, email=r.sitter_email)
 
             try:
                 self.get(user=user)
             except Sitter.DoesNotExist:
-                self.create(user=user)
+                self.create(user=user, name=r.sitter)
+
 
 
 class Sitter(AbstractCustomer):
@@ -46,15 +48,15 @@ class OwnerManager(models.Manager):
     def populate(self):
         for r in RawReview.objects.all():
             try:
-                user = User.objects.get(username=r.owner)
+                user = User.objects.get(username=r.owner_email)
             except User.DoesNotExist:
                 user = User.objects.create_user(
-                    username=r.owner, email=r.owner_email)
+                    username=r.owner_email, email=r.owner_email)
 
             try:
                 self.get(user=user)
             except Owner.DoesNotExist:
-                self.create(user=user, dogs=r.dogs)
+                self.create(user=user, name=r.owner, dogs=r.dogs)
 
 
 class Owner(AbstractCustomer):
