@@ -1,0 +1,9 @@
+# db
+psycopg2
+psycopg2-binary
+
+# testing
+model-mommy
+
+# local
+django-extensions
