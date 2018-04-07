@@ -13,3 +13,4 @@ class Command(BaseCommand):
         Sitter.objects.populate()
         RawReview.objects.set_owner_and_sitter_fks()
         Review.objects.populate()
+        Sitter.objects.set_scores()
