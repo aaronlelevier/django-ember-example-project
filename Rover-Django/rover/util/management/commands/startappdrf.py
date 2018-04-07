@@ -23,7 +23,8 @@ class Command(StartAppCommand):
         # add files
         with open(path.join(app_dir, 'serializers.py'), 'w') as f: pass
 
-        os.mkdir(path.join(app_dir, 'tests'))
+        test_dir = path.join(app_dir, 'tests')
+        os.mkdir(test_dir)
 
         for file in ['__init__.py', 'test_models.py', 'test_views.py']:
-            with open(path.join(app_dir, file), 'w') as f: pass
+            with open(path.join(test_dir, file), 'w') as f: pass

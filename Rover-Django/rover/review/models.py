@@ -2,8 +2,8 @@ import os
 import csv
 from django.conf import settings
 from django.db import models
+from django.apps import apps
 
-from customer.models import Sitter, Owner
 from util.models import AbstractModel
 
 
@@ -19,6 +19,18 @@ class RawReviewManager(models.Manager):
             reader = csv.DictReader(csvfile)
             self.bulk_create(
                 [self.model(**r) for r in reader])
+
+    def set_owner_and_sitter_fks(self):
+        Owner = apps.get_model('customer', 'Owner')
+        Sitter = apps.get_model('customer', 'Sitter')
+
+        owners = {owner.user.username: owner for owner in Owner.objects.all()}
+        sitters = {sitter.user.username: sitter for sitter in Sitter.objects.all()}
+        
+        for r in self.all():
+            setattr(r, 'owner_object', owners[r.owner])
+            setattr(r, 'sitter_object', sitters[r.sitter])
+            r.save()
 
 
 class RawReview(models.Model):
@@ -42,16 +54,33 @@ class RawReview(models.Model):
     sitter_phone_number = models.CharField(max_length=12)
     sitter_email = models.EmailField()
 
+    # NOTE: (not part of original data)
+    # add owner / sitter fk once tables are populated
+    sitter_object = models.ForeignKey(
+        'customer.Sitter', null=True, on_delete=models.SET_NULL,
+        related_name='raw_reviews')
+    owner_object = models.ForeignKey(
+        'customer.Owner', null=True, on_delete=models.SET_NULL,
+        related_name='raw_reviews')
+
     objects = RawReviewManager()
 
-    """
-    TODO:
-    add owner / sitter fk once tables are populated
-    """
-    sitter_object = models.ForeignKey(
-        Sitter, null=True, on_delete=models.SET_NULL, related_name='raw_reviews')
-    owner_object = models.ForeignKey(
-        Owner, null=True, on_delete=models.SET_NULL, related_name='raw_reviews')
+
+class ReviewManager(models.Manager):
+
+    def populate(self):
+        reviews = []
+        for rr in RawReview.objects.all():
+            reviews.append(
+                Review(**{
+                    'sitter': rr.sitter_object,
+                    'owner': rr.owner_object,
+                    'rating': rr.rating,
+                    'start_date': rr.start_date,
+                    'end_date': rr.end_date,
+                    'dogs': rr.dogs
+                    }))
+        self.bulk_create(reviews)
 
 
 class Review(AbstractModel):
@@ -61,12 +90,14 @@ class Review(AbstractModel):
     """
     # keys
     sitter = models.ForeignKey(
-        Sitter, on_delete=models.CASCADE, related_name='reviews')
+        'customer.Sitter', on_delete=models.CASCADE, related_name='reviews')
     owner = models.ForeignKey(
-        Owner, on_delete=models.CASCADE, related_name='reviews')
+        'customer.Owner', on_delete=models.CASCADE, related_name='reviews')
     # fields
     rating = models.PositiveIntegerField()
     start_date = models.DateField()
     end_date = models.DateField()
     text = models.TextField()
     dogs = models.CharField(max_length=200)
+
+    objects = ReviewManager()
