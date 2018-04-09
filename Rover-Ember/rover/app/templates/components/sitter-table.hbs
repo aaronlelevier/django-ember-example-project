@@ -1,0 +1,30 @@
+{{#light-table table
+  height='65vh'
+  responsive=true
+  as |t|
+}}
+
+  {{t.head}}
+
+  {{#t.body as |body|}}
+
+    {{#body.expanded-row as |row|}}
+      {{responsive-expanded-row table=table row=row}}
+    {{/body.expanded-row}}
+
+    {{#if isLoading}}
+      {{#body.loader}}
+        Loading...
+      {{/body.loader}}
+    {{/if}}
+
+    {{#if table.isEmpty}}
+      {{#body.no-data}}
+        No results
+      {{/body.no-data}}
+    {{/if}}
+  {{/t.body}}
+
+  {{t.foot}}
+
+{{/light-table}}
