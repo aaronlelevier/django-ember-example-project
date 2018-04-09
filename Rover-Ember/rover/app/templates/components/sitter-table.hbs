@@ -4,7 +4,13 @@
   as |t|
 }}
 
-  {{t.head}}
+   {{t.head
+    onColumnClick=(action 'onColumnClick')
+    iconSortable='fa fa-sort'
+    iconAscending='fa fa-sort-asc'
+    iconDescending='fa fa-sort-desc'
+    fixed=true
+  }}
 
   {{#t.body as |body|}}
 
