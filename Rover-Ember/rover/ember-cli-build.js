@@ -9,8 +9,15 @@ module.exports = function(defaults) {
         content: '/static/'
       }
     },
+
     fingerprint: {
       prepend: '/static/',
+    },
+
+    'ember-bootstrap': {
+      'bootstrapVersion': 3,
+      'importBootstrapFont': true,
+      'importBootstrapCSS': true
     }
   });
 

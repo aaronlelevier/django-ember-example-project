@@ -1,1 +1,17 @@
 @import "pod-styles.css";
+
+.ember-application {
+    background: #F3F3F3;
+}
+.ember-application .container {
+    background: #ffffff;
+    border: 1px;
+}
+h1 {
+    background: #00bd70;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    text-indent: 8px;
+    border-radius: 10px;
+    color: #ffffff;
+}
