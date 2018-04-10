@@ -11,3 +11,9 @@
     float: left;
     padding: 1em;
 }
+.disabled a {
+  color: grey;
+}
+.active a {
+  color: red;
+}

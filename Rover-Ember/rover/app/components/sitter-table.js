@@ -1,6 +1,5 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { isEmpty } from '@ember/utils';
 import { inject as service } from '@ember/service';
 import Table from 'ember-light-table';
 import { task } from 'ember-concurrency';
@@ -11,7 +10,6 @@ export default Component.extend({
   dir: null,
   sort: null,
   minRating: null,
-  canLoadMore: true,
   enableSync: true,
   meta: null,
   table: null,
@@ -38,7 +36,6 @@ export default Component.extend({
 
     this.get('model').pushObjects(records.toArray());
     this.set('meta', records.get('meta'));
-    this.set('canLoadMore', !isEmpty(records));
   }).restartable(),
   columns: computed(function() {
     return [{
@@ -87,7 +84,6 @@ export default Component.extend({
         this.setProperties({
           dir: column.ascending ? 'asc' : 'desc',
           sort: column.get('valuePath'),
-          canLoadMore: true,
           page: 1
         });
         this.clearAndFetchRecords();
@@ -99,6 +95,7 @@ export default Component.extend({
       } else {
         this.set('minRating', null);
       }
+      this.set('page', 1);
       this.clearAndFetchRecords();
     },
     setPage(page) {
@@ -106,7 +103,7 @@ export default Component.extend({
 
       let currPage = this.get('page');
 
-      if (page < 2 || page > totalPages || page === currPage) {
+      if (page < 1 || page > totalPages || page === currPage) {
         return;
       }
 

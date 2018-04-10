@@ -26,7 +26,7 @@ export default function() {
   this.get('/sitters', () => {
     return {
       count: 3,
-      page_count: 5,
+      page_count: 18,
       next: null,
       previous: null,
       results: [{

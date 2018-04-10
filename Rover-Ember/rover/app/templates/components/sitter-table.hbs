@@ -51,18 +51,28 @@
         <td class="align-center" colspan={{columns.length}}>
           <ul class="pagination pagination-sm">
             <li class={{if (eq page 1) 'disabled'}}>
-              <a {{action 'setPage' (dec page)}} href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
+              <a {{action 'setPage' 1}} href="#" aria-label="First">
+                <span aria-hidden="true">&#8810;</span>
               </a>
             </li>
-            {{#each (range 1 meta.page_count true) as |p|}}
+            <li class={{if (eq page 1) 'disabled'}}>
+              <a {{action 'setPage' (dec page)}} href="#" aria-label="Previous">
+                <span aria-hidden="true">&#8826;</span>
+              </a>
+            </li>
+            {{#each (range (start-page page) (end-page page meta.page_count) true) as |p|}}
               <li class={{if (eq p page) 'active'}}>
                 <a {{action 'setPage' p}} href="#">{{p}}</a>
               </li>
             {{/each}}
             <li class={{if (eq page meta.page_count) 'disabled'}}>
               <a {{action 'setPage' (inc page)}} href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
+                <span aria-hidden="true">&#8827;</span>
+              </a>
+            </li>
+            <li class={{if (eq page meta.page_count) 'disabled'}}>
+              <a {{action 'setPage' meta.page_count}} href="#" aria-label="Last">
+                <span aria-hidden="true">&#8811;</span>
               </a>
             </li>
           </ul>
