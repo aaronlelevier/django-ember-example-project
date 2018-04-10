@@ -4,3 +4,10 @@
 .min-rating-select {
     width: 15em;
 }
+.pagination {
+    list-style: none;
+}
+.pagination li {
+    float: left;
+    padding: 1em;
+}

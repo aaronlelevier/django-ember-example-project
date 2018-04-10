@@ -21,6 +21,7 @@ export default Component.extend({
 
     let table = new Table(this.get('columns'), this.get('model'), { enableSync: this.get('enableSync') });
 
+    this.send('setPage', 1);
     this.set('table', table);
     this.set('rating_options', [
       {value: 5},
@@ -99,6 +100,19 @@ export default Component.extend({
         this.set('minRating', null);
       }
       this.clearAndFetchRecords();
+    },
+    setPage(page) {
+      let totalPages = this.get('meta.totalPages');
+
+      let currPage = this.get('page');
+
+      if (page < 2 || page > totalPages || page === currPage) {
+        return;
+      }
+
+      this.set('page', page);
+      this.get('model').clear();
+      this.get('fetchRecords').perform();
     }
   }
 });

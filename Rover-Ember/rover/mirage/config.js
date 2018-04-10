@@ -25,6 +25,10 @@ export default function() {
   */
   this.get('/sitters', () => {
     return {
+      meta: {
+        count: 3,
+        totalPages: 5
+      },
       results: [{
         id: 1,
         name: 'Zelda',
