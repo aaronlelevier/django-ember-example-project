@@ -55,12 +55,12 @@
                 <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
-            {{#each (range 1 meta.totalPages true) as |p|}}
+            {{#each (range 1 meta.page_count true) as |p|}}
               <li class={{if (eq p page) 'active'}}>
                 <a {{action 'setPage' p}} href="#">{{p}}</a>
               </li>
             {{/each}}
-            <li class={{if (eq page meta.totalPages) 'disabled'}}>
+            <li class={{if (eq page meta.page_count) 'disabled'}}>
               <a {{action 'setPage' (inc page)}} href="#" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
               </a>

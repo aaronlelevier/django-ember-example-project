@@ -102,7 +102,7 @@ export default Component.extend({
       this.clearAndFetchRecords();
     },
     setPage(page) {
-      let totalPages = this.get('meta.totalPages');
+      let totalPages = this.get('meta.page_count');
 
       let currPage = this.get('page');
 
