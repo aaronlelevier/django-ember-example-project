@@ -1,10 +1,19 @@
 <div class="min-rating-select">
+  <input
+    class="search-name-input"
+    type="text"
+    placeholder="Search by Name"
+    value={{value}}
+    oninput={{action "searchName" value="target.value"}}
+  >
+</div>
+
+<div class="min-rating-select">
   {{#power-select
     allowClear=true
     options=rating_options
     placeholder="Select a minimum rating"
     selected=minRating
-    searchField="name"
     onchange=(action 'minRatingSelected')
     as |minRating|
   }}

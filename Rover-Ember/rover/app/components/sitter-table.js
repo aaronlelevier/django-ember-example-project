@@ -1,3 +1,4 @@
+import { debounce } from "@ember/runloop";
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
@@ -62,6 +63,10 @@ export default Component.extend({
     if (minRating) {
       params['min_ratings_score'] = minRating.value;
     }
+    let searchNameParam = this.get('searchNameParam');
+    if (searchNameParam) {
+      params['name'] = searchNameParam;
+    }
     return params;
   },
   getOrderingParam() {
@@ -73,6 +78,10 @@ export default Component.extend({
       s += this.get('sort');
       return s;
     }
+  },
+  searchByNameParam(name) {
+    this.set('searchNameParam', name);
+    this.clearAndFetchRecords();
   },
   clearAndFetchRecords() {
     this.get('model').clear();
@@ -110,6 +119,9 @@ export default Component.extend({
       this.set('page', page);
       this.get('model').clear();
       this.get('fetchRecords').perform();
+    },
+    searchName(name) {
+      debounce(this, this.searchByNameParam, name, 500);
     }
   }
 });
