@@ -40,7 +40,7 @@ export default Component.extend({
   columns: computed(function() {
     return [{
       label: 'Photo',
-      valuePath: 'photo',
+      valuePath: 'image',
       cellComponent: 'user-avatar',
       sortable: false
     },{

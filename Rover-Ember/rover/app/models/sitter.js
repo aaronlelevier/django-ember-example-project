@@ -4,6 +4,6 @@ const { attr } = DS;
 
 export default DS.Model.extend({
   name: attr('string'),
-  photo: attr('string'),
+  image: attr('string'),
   ratings_score: attr('number')
 });

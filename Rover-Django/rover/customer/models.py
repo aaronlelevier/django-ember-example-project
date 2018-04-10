@@ -28,7 +28,7 @@ class SitterManager(models.Manager):
             try:
                 self.get(user=user)
             except Sitter.DoesNotExist:
-                self.create(user=user, name=r.sitter)
+                self.create(user=user, name=r.sitter, image=r.sitter_image)
 
     def set_scores(self):
         sitters = {}

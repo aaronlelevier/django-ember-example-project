@@ -32,17 +32,17 @@ export default function() {
       results: [{
         id: 1,
         name: 'Zelda',
-        photo: "http://placekitten.com/g/500/500?user=92",
+        image: "http://placekitten.com/g/500/500?user=92",
         ratings_score: 3.25,
       }, {
         id: 2,
         name: 'Link',
-        photo: "http://placekitten.com/g/500/500?user=306",
+        image: "http://placekitten.com/g/500/500?user=306",
         ratings_score: 3.333333333333,
       }, {
         id: 3,
         name: 'Epona',
-        photo: "http://placekitten.com/g/500/500?user=313",
+        image: "http://placekitten.com/g/500/500?user=313",
         ratings_score: 4.736525,
       }]
     };

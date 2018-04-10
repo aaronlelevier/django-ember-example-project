@@ -25,6 +25,8 @@ class SitterManagerTests(TestCase):
         self.assertEqual(User.objects.count(), expected_count)
         self.assertEqual(User.objects.filter(email__isnull=True).count(), 0)
         self.assertEqual(Sitter.objects.count(), expected_count)
+        self.assertEqual(
+            Sitter.objects.exclude(image='').count(), Sitter.objects.count())
 
 
 class SitterManagerScoreTests(TestCase):

@@ -6,6 +6,11 @@ from rest_framework.filters import OrderingFilter
 
 from customer.models import Sitter
 from customer.serializers import SitterSerializer
+from django.views.generic.base import TemplateView
+
+
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
 
 class SitterListAPIView(ListAPIView):

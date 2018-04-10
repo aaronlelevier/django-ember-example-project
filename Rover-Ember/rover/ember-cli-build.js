@@ -4,7 +4,14 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
   let app = new EmberApp(defaults, {
-    // Add options here
+    inlineContent: {
+      staticPath: {
+        content: '/static/'
+      }
+    },
+    fingerprint: {
+      prepend: '/static/',
+    }
   });
 
   // Use `app.import` to add additional libraries to the generated
