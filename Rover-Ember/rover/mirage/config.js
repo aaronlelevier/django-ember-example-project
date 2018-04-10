@@ -25,10 +25,9 @@ export default function() {
   */
   this.get('/sitters', () => {
     return {
-      meta: {
-        count: 3,
-        totalPages: 5
-      },
+      count: 3,
+      next: null,
+      previous: null,
       results: [{
         id: 1,
         name: 'Zelda',
@@ -44,7 +43,7 @@ export default function() {
         name: 'Epona',
         photo: "http://placekitten.com/g/500/500?user=313",
         ratings_score: 4.736525,
-      }, ]
+      }]
     };
   });
 

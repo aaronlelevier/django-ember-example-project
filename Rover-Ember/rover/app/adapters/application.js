@@ -1,14 +1,5 @@
-import DS from 'ember-data';
+import DRFAdapter from 'ember-django-adapter/adapters/drf';
 
-export default DS.RESTAdapter.extend({
+export default DRFAdapter.extend({
   namespace: 'api',
-
-  // add trailing slashes to all requests
-  buildURL: function(modelName, id, snapshot, requestType, query) {
-    var url = this._super(modelName, id, snapshot, requestType, query);
-    if (url.charAt(url.length - 1) !== '/') {
-      url += '/';
-    }
-    return url;
-  },
 });
