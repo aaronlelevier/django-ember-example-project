@@ -4,13 +4,13 @@ import { isEmpty } from '@ember/utils';
 import { inject as service } from '@ember/service';
 import Table from 'ember-light-table';
 import { task } from 'ember-concurrency';
-import { get, set } from '@ember/object';
 
 export default Component.extend({
   store: service(),
   page: 1,
   dir: null,
   sort: null,
+  minRating: null,
   canLoadMore: true,
   enableSync: true,
   meta: null,
@@ -22,6 +22,14 @@ export default Component.extend({
     let table = new Table(this.get('columns'), this.get('model'), { enableSync: this.get('enableSync') });
 
     this.set('table', table);
+    this.set('rating_options', [
+      {value: 5},
+      {value: 4},
+      {value: 3},
+      {value: 2},
+      {value: 1},
+      {value: 0}
+    ]);
     this.get('fetchRecords').perform();
   },
   fetchRecords: task(function*() {
@@ -52,6 +60,10 @@ export default Component.extend({
     if (orderingParam) {
       params['ordering'] = orderingParam;
     }
+    let minRating = this.get('minRating');
+    if (minRating) {
+      params['min_ratings_score'] = minRating.value;
+    }
     return params;
   },
   getOrderingParam() {
@@ -64,6 +76,10 @@ export default Component.extend({
       return s;
     }
   },
+  clearAndFetchRecords() {
+    this.get('model').clear();
+    this.get('fetchRecords').perform();
+  },
   actions: {
     onColumnClick(column) {
       if (column.sorted) {
@@ -73,9 +89,16 @@ export default Component.extend({
           canLoadMore: true,
           page: 1
         });
-        this.get('model').clear();
-        this.get('fetchRecords').perform();
+        this.clearAndFetchRecords();
       }
+    },
+    minRatingSelected(option) {
+      if (option) {
+        this.set('minRating', {value: option.value});
+      } else {
+        this.set('minRating', null);
+      }
+      this.clearAndFetchRecords();
     }
   }
 });

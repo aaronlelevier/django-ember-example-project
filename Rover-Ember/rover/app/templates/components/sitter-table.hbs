@@ -1,3 +1,17 @@
+<div class="min-rating-select">
+  {{#power-select
+    allowClear=true
+    options=rating_options
+    placeholder="Select a minimum rating"
+    selected=minRating
+    searchField="name"
+    onchange=(action 'minRatingSelected')
+    as |minRating|
+  }}
+    {{minRating.value}}
+  {{/power-select}}
+</div>
+
 {{#light-table table
   height='65vh'
   responsive=true
