@@ -14,6 +14,10 @@ export default Component.extend({
   enableSync: true,
   meta: null,
   table: null,
+  isLoading: computed.oneWay('fetchRecords.isRunning'),
+  isEmpty: computed('table.isEmpty', 'isLoading', function() {
+    return this.get('table.isEmpty') && !this.get('isLoading');
+  }),
 
   init() {
     this._super(...arguments);

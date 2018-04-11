@@ -43,11 +43,11 @@
 
     {{#if isLoading}}
       {{#body.loader}}
-        Loading...
+        {{loading-spinner}}
       {{/body.loader}}
     {{/if}}
 
-    {{#if table.isEmpty}}
+    {{#if isEmpty}}
       {{#body.no-data}}
         No results
       {{/body.no-data}}
