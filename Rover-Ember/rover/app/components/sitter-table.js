@@ -3,7 +3,7 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Table from 'ember-light-table';
-import { task } from 'ember-concurrency';
+import { task, timeout } from 'ember-concurrency';
 
 export default Component.extend({
   store: service(),
@@ -36,12 +36,16 @@ export default Component.extend({
     ]);
     this.get('fetchRecords').perform();
   },
+
+  // async generator for fetching sitter records
   fetchRecords: task(function*() {
     let records = yield this.get('store').query('sitter', this.getQueryParams());
-
+    yield timeout(500);
     this.get('model').pushObjects(records.toArray());
     this.set('meta', records.get('meta'));
   }).restartable(),
+
+  // computed properties
   columns: computed(function() {
     return [{
       label: 'Photo',
@@ -57,21 +61,18 @@ export default Component.extend({
       cellComponent: 'ratings-score'
     }];
   }),
+
+  // query param getters
   getQueryParams() {
-    let params = this.getProperties(['page']);
     let orderingParam = this.getOrderingParam();
-    if (orderingParam) {
-      params['ordering'] = orderingParam;
-    }
-    let minRating = this.get('minRating');
-    if (minRating) {
-      params['min_ratings_score'] = minRating.value;
-    }
+    let minRating = this.getMinRating();
     let searchNameParam = this.get('searchNameParam');
-    if (searchNameParam) {
-      params['name'] = searchNameParam;
-    }
-    return params;
+
+    return Object.assign(this.getProperties(['page']), {
+      ordering: orderingParam ? orderingParam : undefined,
+      min_ratings_score: minRating ? minRating : undefined,
+      name: searchNameParam ? searchNameParam : undefined,
+    });
   },
   getOrderingParam() {
     if (this.get('dir') || this.get('sort')) {
@@ -83,37 +84,53 @@ export default Component.extend({
       return s;
     }
   },
+  getMinRating() {
+    let minRating = this.get('minRating');
+    if (minRating) {
+      return minRating.value;
+    }
+  },
+
+  // requests for query param sort, filter, and searching
+  sortByColumn(column) {
+    if (column.sorted) {
+      this.setProperties({
+        dir: column.ascending ? 'asc' : 'desc',
+        sort: column.get('valuePath'),
+      });
+      this.fetchNewRecords();
+    }
+  },
+  filterByMinRating(input) {
+    if (input) {
+      this.set('minRating', {value: input.value});
+    } else {
+      this.set('minRating', null);
+    }
+    this.fetchNewRecords();
+  },
   searchByNameParam(name) {
     this.set('searchNameParam', name);
-    this.clearAndFetchRecords();
+    this.fetchNewRecords();
   },
-  clearAndFetchRecords() {
+
+  // wrapper for new fetches
+  fetchNewRecords() {
     this.get('model').clear();
+    this.set('page', 1);
     this.get('fetchRecords').perform();
   },
+
+  // user actions
   actions: {
     onColumnClick(column) {
-      if (column.sorted) {
-        this.setProperties({
-          dir: column.ascending ? 'asc' : 'desc',
-          sort: column.get('valuePath'),
-          page: 1
-        });
-        this.clearAndFetchRecords();
-      }
+      this.sortByColumn(column);
     },
     minRatingSelected(option) {
-      if (option) {
-        this.set('minRating', {value: option.value});
-      } else {
-        this.set('minRating', null);
-      }
-      this.set('page', 1);
-      this.clearAndFetchRecords();
+      this.filterByMinRating(option);
     },
     setPage(page) {
       let totalPages = this.get('meta.page_count');
-
       let currPage = this.get('page');
 
       if (page < 1 || page > totalPages || page === currPage) {
