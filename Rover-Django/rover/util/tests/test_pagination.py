@@ -1,7 +1,7 @@
+from model_mommy import mommy
 from rest_framework.test import APITestCase
 
 from customer.models import Sitter
-from model_mommy import mommy
 from util.pagination import RoverPageNumberPagination
 
 

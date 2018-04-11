@@ -1,12 +1,9 @@
-from django.shortcuts import render
-
-from rest_framework.generics import ListAPIView
-
+from django.views.generic.base import TemplateView
 from rest_framework.filters import OrderingFilter
+from rest_framework.generics import ListAPIView
 
 from customer.models import Sitter
 from customer.serializers import SitterSerializer
-from django.views.generic.base import TemplateView
 
 
 class IndexView(TemplateView):

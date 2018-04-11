@@ -1,10 +1,9 @@
 import math
-from django.conf import settings
-
 from collections import OrderedDict
 
-from rest_framework.response import Response
+from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 class RoverPageNumberPagination(PageNumberPagination):

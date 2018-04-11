@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Count, Avg, Sum
+from django.db.models import Avg, Count
 
 from review.models import RawReview, Review
 from util.models import AbstractModel
@@ -32,7 +32,8 @@ class SitterManager(models.Manager):
 
     def set_scores(self):
         sitters = {}
-        for r in (Review.objects.values('sitter__name', 'sitter__user__username')
+        for r in (Review.objects.values('sitter__name',
+                                        'sitter__user__username')
                                 .annotate(stays=Count('rating'))
                                 .annotate(rating=Avg('rating'))):
             sitters[r['sitter__user__username']] = r
@@ -57,18 +58,20 @@ class Sitter(AbstractCustomer):
     objects = SitterManager()
 
     def calc_sitter_score(self):
-        return (sum(1 for let in {s for s in self.name.lower()} if let.isalpha()) / 26)*5
+        return (sum(1 for let in {s for s in self.name.lower()}
+                if let.isalpha()) / 26)*5
 
     def calc_overall_score(self):
         if self.stays == 0:
             return self.sitter_score
         elif self.stays >= 10:
             return self.ratings_score
-        return self.stays * .1 * self.ratings_score + (self.sitter_score * (1 - (self.stays * .1)))
+        return self.stays * .1 * self.ratings_score + \
+            (self.sitter_score * (1 - (self.stays * .1)))
 
 
 class OwnerManager(models.Manager):
-    
+
     def populate(self):
         for r in RawReview.objects.all():
             try:
@@ -80,7 +83,8 @@ class OwnerManager(models.Manager):
             try:
                 self.get(user=user)
             except Owner.DoesNotExist:
-                self.create(user=user, name=r.owner, dogs=r.dogs)
+                self.create(
+                    user=user, name=r.owner, dogs=r.dogs, image=r.owner_image)
 
 
 class Owner(AbstractCustomer):

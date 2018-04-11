@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
+from django.db.models import Sum
 from django.test import TestCase
-from django.db.models import Sum, Count, Avg
-
 from model_mommy import mommy
 
 from customer.models import Owner, OwnerManager, Sitter, SitterManager
@@ -59,7 +58,8 @@ class SitterManagerScoreTests(TestCase):
 
         self.assertFloatEqual(
             sitter.sitter_score,
-            (sum(1 for let in {s.lower() for s in sitter.name} if let.isalpha()) / 26)*5)
+            (sum(1 for let in {s.lower() for s in sitter.name}
+                   if let.isalpha()) / 26)*5)
 
     def test_set_scores__overall_score(self):
         self.assertFloatEqual(
@@ -82,8 +82,8 @@ class SitterTests(TestCase):
 
         self.assertEqual(
             sitter.calc_sitter_score(),
-            (sum(1 for let in {s for s in sitter.name.lower()} if let.isalpha()) / 26)*5
-        )
+            (sum(1 for let in {s for s in sitter.name.lower()}
+                   if let.isalpha()) / 26)*5)
 
     def test_calc_overall_score(self):
         for i in range(13):
@@ -113,6 +113,8 @@ class OwnerManagerTests(TestCase):
         self.assertEqual(User.objects.count(), expected_count)
         self.assertEqual(User.objects.filter(email__isnull=True).count(), 0)
         self.assertEqual(Owner.objects.count(), expected_count)
+        self.assertEqual(
+            Owner.objects.exclude(image='').count(), Owner.objects.count())
 
 
 class OwnerTests(TestCase):

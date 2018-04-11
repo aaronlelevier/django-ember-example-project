@@ -23,7 +23,7 @@ cp -r ../../Rover-Ember/rover/dist/index.html templates
 
 echo "Activate virtualenv"
 cd $CURRENT_DIR/Rover-Django
-deactivate
+
 if [ ! -d venv ]; then
     python3 -m venv venv
 fi

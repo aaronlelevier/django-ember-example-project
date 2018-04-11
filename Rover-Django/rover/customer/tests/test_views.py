@@ -2,9 +2,9 @@ import os
 
 from django.conf import settings
 from django.test import TestCase
+from model_mommy import mommy
 from rest_framework.test import APITestCase
 
-from model_mommy import mommy
 from customer.models import Sitter
 
 
@@ -14,7 +14,8 @@ class IndexViewTests(TestCase):
         # file not in version contol, so must create pre-test
         fname = os.path.join(settings.TEMPLATES_DIR, 'index.html')
         if not os.path.isfile(fname):
-            with open(fname, 'w') as f: pass
+            with open(fname, 'w') as f:
+                pass
 
         response = self.client.get('/')
 
@@ -58,6 +59,7 @@ class SitterTests(APITestCase):
         sitter_names = [x['name'] for x in data['results']]
         self.assertIn(sitter.name, sitter_names)
         self.assertIn(sitter2.name, sitter_names)
+        self.assertNotIn(sitter3.name, sitter_names)
 
     def test_sort_by_name(self):
         response = self.client.get('/api/sitters/?ordering={}'.format('name'))

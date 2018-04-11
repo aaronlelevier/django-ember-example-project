@@ -1,8 +1,9 @@
-import os
 import csv
+import os
+
+from django.apps import apps
 from django.conf import settings
 from django.db import models
-from django.apps import apps
 
 from util.models import AbstractModel
 
@@ -26,7 +27,7 @@ class RawReviewManager(models.Manager):
 
         owners = {owner.user.username: owner for owner in Owner.objects.all()}
         sitters = {sitter.user.username: sitter for sitter in Sitter.objects.all()}
-        
+
         for r in self.all():
             setattr(r, 'owner_object', owners[r.owner_email])
             setattr(r, 'sitter_object', sitters[r.sitter_email])
