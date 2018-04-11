@@ -1,9 +1,19 @@
+Django==2.0.4
+djangorestframework==3.8.2
+
+# linting
+isort==4.3.4
+pylint==1.8.3
+
 # db
-psycopg2
-psycopg2-binary
+psycopg2-binary==2.7.4
 
 # testing
-model-mommy
+model-mommy==1.5.1
 
-# local
-django-extensions
+# ipython notebook with django
+ipython[notebook]
+django-extensions==2.0.6
+
+# data exploration
+pandas==0.22.0

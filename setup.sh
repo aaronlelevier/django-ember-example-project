@@ -6,10 +6,10 @@ cd $CURRENT_DIR
 # ember
 cd Rover-Ember/rover/
 
-echo "ember build"
+echo "Build Ember assets"
 ember build --env=production
 
-echo "copy over assets"
+echo "Copy over static assets"
 cd $CURRENT_DIR/Rover-Django/rover
 
 # remove old files
@@ -21,10 +21,21 @@ cp -r ../../Rover-Ember/rover/dist/assets ember
 cp -r ../../Rover-Ember/rover/dist/fonts ember
 cp -r ../../Rover-Ember/rover/dist/index.html templates
 
-# collect static assets
+echo "Activate virtualenv"
+cd $CURRENT_DIR/Rover-Django
+deactivate
+if [ ! -d venv ]; then
+    python3 -m venv venv
+fi
+source venv/bin/activate
+pip install -r requirements.txt
+
+cd $CURRENT_DIR/Rover-Django/rover
+
+echo "Collect static assets"
 ./manage.py collectstatic --noinput
 
-# database
+echo "Populate database"
 DB_NAME=rover
 psql -U rover -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity \
 WHERE pg_stat_activity.datname = '${DB_NAME}' AND pid <> pg_backend_pid();"
