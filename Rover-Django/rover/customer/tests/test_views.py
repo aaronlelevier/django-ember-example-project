@@ -1,7 +1,24 @@
+import os
+
+from django.conf import settings
+from django.test import TestCase
 from rest_framework.test import APITestCase
 
 from model_mommy import mommy
 from customer.models import Sitter
+
+
+class IndexViewTests(TestCase):
+
+    def test_can_visit_index_view(self):
+        # file not in version contol, so must create pre-test
+        fname = os.path.join(settings.TEMPLATES_DIR, 'index.html')
+        if not os.path.isfile(fname):
+            with open(fname, 'w') as f: pass
+
+        response = self.client.get('/')
+
+        self.assertEqual(response.status_code, 200)
 
 
 class SitterTests(APITestCase):
