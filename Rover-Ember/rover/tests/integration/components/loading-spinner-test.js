@@ -6,21 +6,12 @@ import hbs from 'htmlbars-inline-precompile';
 module('Integration | Component | loading-spinner', function(hooks) {
   setupRenderingTest(hooks);
 
-  test('it renders', async function(assert) {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
+  test('render with CSS spinner class and no text content', async function(assert) {
+    assert.expect(2);
 
     await render(hbs`{{loading-spinner}}`);
 
     assert.equal(this.element.textContent.trim(), '');
-
-    // Template block usage:
-    await render(hbs`
-      {{#loading-spinner}}
-        template block text
-      {{/loading-spinner}}
-    `);
-
-    assert.equal(this.element.textContent.trim(), 'template block text');
+    assert.equal(this.$('div').find('div.lds-rolling').length, 1);
   });
 });
