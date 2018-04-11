@@ -5,8 +5,8 @@ export function endPage([currPage, pageCount]) {
   if (pageCount === 0) {
     return 1;
   }
-  const endPage = startPage([currPage]) * 10;
-  return endPage > pageCount ? pageCount : endPage;
+  const defaultEndPage = startPage([currPage]) * 10;
+  return (defaultEndPage > pageCount ? pageCount : defaultEndPage) + 1;
 }
 
 export default helper(endPage);

@@ -69,7 +69,7 @@
                 <span aria-hidden="true">&#8826;</span>
               </a>
             </li>
-            {{#each (range (start-page page) (end-page page meta.page_count) true) as |p|}}
+            {{#each (range (start-page page) (end-page page meta.page_count) false) as |p|}}
               <li class={{if (eq p page) 'active'}}>
                 <a {{action 'setPage' p}} href="#">{{p}}</a>
               </li>
