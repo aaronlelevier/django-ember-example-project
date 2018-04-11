@@ -1,5 +1,25 @@
 # Rover Requirements
 
+## Dependencies
+
+Python
+
+- [python3](https://www.python.org/downloads/)
+
+Javascript
+
+- [node](https://nodejs.org/en/)
+- [yarn](https://yarnpkg.com/)
+- [ember-cli](https://www.emberjs.com/)
+
+Database
+
+- [PostgreSQL](https://www.postgresql.org/)
+
+## How to run project
+
+
+
 ## Overview
 
 ### Overall Sitter Rank
