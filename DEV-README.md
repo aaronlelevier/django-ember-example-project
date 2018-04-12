@@ -1,6 +1,11 @@
-# Rover Requirements
+# DEV README
 
-## Dependencies
+This README is separated into logic sections.  It's organized in a way to explore the repository and explain the thinking along the way.
+
+Conceptually, I tried to think of this as a single pull request. I took broad strokes and gradually refined in the best way possible in order to keep moving forward and add all of the features.  The commit ordering reflects that. I didn't squash any commits and in order to preserve how things happened. 
+
+
+## Global Dependencies
 
 Python
 
@@ -23,17 +28,19 @@ Once all above global dependencies are installed, to build the project and insta
 
 ```
 ./setup.sh
+cd Rover-Django/rover/
+./manage.py runserver
 ```
 
 ### Run Django tests
 
-From Rover-Django/rover/:
+From `Rover-Django/rover/` dir:
 
 ```
 ./manage.py test
 ```
 
-Django code coverage:
+Django code coverage, From `Rover-Django/rover/` dir:
 
 ```
 coverage run --source='.' manage.py test
@@ -42,7 +49,7 @@ coverage report
 
 ### Run Ember tests
 
-From Rover-Ember/rover/
+From `Rover-Ember/rover/` dir:
 
 ```
 ember test
@@ -75,50 +82,62 @@ The name `Tony L.` appeared as a Owner and Sitter.
 
 Looking at the emails, both `sitter_email` and `owner_email` where prefixed with `user<number>`. Also both were unique across regardless of being an Owner or Sitter, where as the names were not, so I took the `email` as the unique key for Owner or Sitter.
 
-I initially wrote group by's, count, average logic for calculating Sitter scores in Pandas, then writing the new table to a CSV and uploading it to a database table, but I thought that this would better be in Django code, so didn't end up using it.
+Each has a Django `User` one-to-one relationship. The `email` is stored as the Django `username`, which is the only required field on the Django `User` model.
+
+I initially wrote group by's, count, average logic for calculating Sitter scores in Pandas, with the idea to write it to a CSV and upload to a database table, but I thought that this would better be in Django code, so didn't end up using it.
 
 Pandas was helpful for data exploration.
 
 ### Overall Sitter Rank
 
-These are my rough notes from what was in the `README.md`
+This will be the default page ordering.
 
-Sitter Scores must be kept up to date
+Sitter Scores must be kept up to date.
 
 Things that would change it:
 
 - new stay
 - new rating
-- (optional) change in name
+- change in name (optional)
 
-### Sitter API List Endpoint
+### Sitter List View and API Endpoint
 
 Since the main goal was to build a end-to-end List View with sort, order, and filtering logic, I wrote down what data and functionality the List View should have.
 
 Fields
 
+- id
 - name
 - photo
 - ratings score
 
-Order By
+Default ordering
 
 - Overall Sitter Rank
 
 Must be able to scale
 
-- pagination
+- pagination or infinity scroll (I chose pagination)
 
-Filtering Sitters by `min ratings score`
+Filtering
 
-- need UI for the User to set a `min ratings score` and filter out all Users below that score
+- min ratings_score
+- name
 
-Other features
+Ordering
 
-- search by name
-- sort by name
-- sort by ratings score
+- name
+- ratings_score
 
+Search
+
+- name
+
+I will need UI for the User to set a `min ratings score` and filter out all Users below that score
+
+Also for `name` search.
+
+Basic UI for ordering exists with the `ember-light-table` add-on, so just the component logic of what API request to call needs to be written.
 
 ## Backend
 
@@ -147,6 +166,7 @@ I used [model-mommy](https://github.com/vandersonmota/model_mommy) for some test
 
 	- AbstractCustomer
 
+		- name
 		- phone_number
 		- image
 		- user - OneToOneField - User(Django)
@@ -166,23 +186,30 @@ I used [model-mommy](https://github.com/vandersonmota/model_mommy) for some test
 
 	- RawReview upload of `reviews.csv`
 
-	- Review - normalized - with foreign keys to Owner and Sitter
+	- Review
+	
+		- normalized
+		- with foreign keys to `Owner` and `Sitter`
 
 ### Generating of the Scores and populating the database
 
 This logic is in the Django `models.py` files.
 
-Some thoughts about this, is that Django Manager methods are being called to do the data imports, so the logic can be custom Manager methods. Another thought is that this represents a database `seeding` concept, and if one wanted to keep the Django Manager classes as production code only, since a database `seed` only happense once and isn't production logic, then for example a separate `seed` app could be created to encapsulate this logic. 
+Some thoughts about this, is that Django Manager methods are being called to do the data imports, so the logic can be in custom Manager methods. Another thought is that this represents a database `seeding` concept, and if one wanted to keep the Django Manager classes as production code only, since a database `seed` only happense once and isn't production logic, then for example a separate `seed` app could be created to encapsulate this logic. 
 
 ### Testing
 
 Pretty strait forward unit tests, and end to end tests that filter logic works and returned properly sorted, filter, ordered data. Unit tests for methods and so on.
 
+### Debugging
+
+Used Python standard debugger `pdb`
+
 ## Frontend
 
-Chose [EmberJs](https://www.emberjs.com/). Our app at my previous position was built with EmberJs and this is the single page app framework that I'm the most familiar with.
+I chose [EmberJs](https://www.emberjs.com/). Our app at my previous position was built with EmberJs and this is the single page app framework that I'm the most familiar with.
 
-Some hurdles that I ran into were that a lot of internal app structure that we had we custom built and didn't use Ember 3rd partly libaries for. I used some 3rd party libraries in place of our custom logic.
+Some hurdles that I ran into were that a lot of  internal app structure that we had we custom built and didn't use Ember 3rd partly libaries for. I used some 3rd party libraries in place of our custom logic.
 
 - Table Grid - [ember-light-table](https://github.com/offirgolan/ember-light-table)
 
@@ -200,15 +227,36 @@ Some hurdles that I ran into were that a lot of internal app structure that we h
 
 - Select box for "min ratings score" filter - [ember-power-select]()
 
+	- we used this add-on
+
 - Rating score formatting - [ember-cli-accounting](https://github.com/cibernox/ember-cli-accounting)
 
+	- we used this add-on
 	- wraps [accounting.js](http://openexchangerates.github.io/accounting.js/)
+
+
+### Styling
+
+Disclaimer, I am a backend developer. This app probably has the best styling that I've ever done. I usually use templates from [themeforest.net](https://themeforest.net/) on personal projects. One of the requirements was an appealing UI, so I did my best to do that. And also, if the UI is no good, to a certain point it doesn't matter if the backend is great because no one wants to use it right!  I didn't use a ThemeForest template because that would be bloat for a single view, and I didn't feel right about that vs. using open source Javascript, Python, libraries etc... which is different.
+
+Used [ember-boostrap](http://www.ember-bootstrap.com/) for styling and CSS grid, container.
+
+Used Rover green.
+
+Created a spinner with Rover green on [loading.io](https://loading.io/)
+
+[ember-font-awesome](https://github.com/martndemus/ember-font-awesome) for fa-icons
+
+Wrote app wide CSS and used [ember-component-css](https://github.com/ebryn/ember-component-css) for component specific CSS
 
 ### Testing
 
 I wrote tests for the `start-page` and `end-page` helper function because they involved a variety of cases and math, so this was the fastest way to iterate.
 
-The `sitter-table` is manually tested. I ran out of time here. This should be acceptance that the User clicks are generating the correct xhr requests.
+The `sitter-table` is end-to-end manually tested. This was the faster way to iterate on the functionality, but obvious automated tests are needed for scaling. There are some initial component and unit tests. I ran out of time here. This should be acceptance that the User clicks are generating the correct xhr requests that match what the API expects.
 
+### Debugging
 
+Used Chrome debug tools.
 
+In EmberJs used `debugger` and `assert.async()` with `qunit`
