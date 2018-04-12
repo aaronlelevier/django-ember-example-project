@@ -22,9 +22,11 @@ export default Component.extend({
   init() {
     this._super(...arguments);
 
-    let table = new Table(this.get('columns'), this.get('model'), { enableSync: this.get('enableSync') });
-
+    if (!this.get('model')) {
+      this.set('model', []);
+    }
     this.send('setPage', 1);
+    let table = new Table(this.get('columns'), this.get('model'), { enableSync: this.get('enableSync') });
     this.set('table', table);
     this.set('rating_options', [
       {value: 5},
