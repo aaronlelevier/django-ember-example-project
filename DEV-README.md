@@ -24,11 +24,20 @@ Database
 
 ## How to run project
 
-Once all above global dependencies are installed, to build the project and install all dependencies for Ember and Django, from the project home run:
+Once all above global dependencies are installed, to build the project and install all dependencies for Ember and Django, from the project home:
 
 ```
-./setup.sh
-cd Rover-Django/rover/
+# create virualenv and install pip dependencies
+cd Rover-Django
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# build project
+bash ../setup.sh
+
+# run project
+cd ../Rover-Django/rover/
 ./manage.py runserver
 ```
 
