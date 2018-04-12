@@ -7,6 +7,9 @@ from util.models import AbstractModel
 
 
 class AbstractCustomer(AbstractModel):
+    # keys
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # fields
     name = models.CharField(max_length=25)
     image = models.URLField()
     phone_number = models.CharField(max_length=12)
@@ -47,9 +50,6 @@ class SitterManager(models.Manager):
 
 
 class Sitter(AbstractCustomer):
-    # keys
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # fields
     stays = models.PositiveIntegerField(default=0)
     ratings_score = models.FloatField(default=0)
     sitter_score = models.FloatField(default=0)
@@ -88,9 +88,6 @@ class OwnerManager(models.Manager):
 
 
 class Owner(AbstractCustomer):
-    # keys
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # fields
     dogs = models.CharField(max_length=200)
 
     objects = OwnerManager()
