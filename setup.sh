@@ -6,6 +6,9 @@ cd $CURRENT_DIR
 # ember
 cd Rover-Ember/rover/
 
+echo "Install dependencies"
+yarn
+
 echo "Build Ember assets"
 ember build --env=production
 

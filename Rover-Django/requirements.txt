@@ -4,6 +4,7 @@ djangorestframework==3.8.2
 # linting
 isort==4.3.4
 pylint==1.8.3
+coverage==4.5.1
 
 # db
 psycopg2-binary==2.7.4
