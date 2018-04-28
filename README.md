@@ -269,3 +269,10 @@ The `sitter-table` is end-to-end manually tested. This was the faster way to ite
 Used Chrome debug tools.
 
 In EmberJs used `debugger` and `assert.async()` with `qunit`
+
+
+## UI
+
+After building the project and running on the localhost via Django with `./manage.py runserver`, it should look like this
+
+![Imgur](https://i.imgur.com/FUEhIVB.png)
