@@ -1,76 +1,271 @@
-# Rover Coding Project
+# README
 
-Rover.com was destroyed in a terrible Amazon and GitHub accident.
-Thankfully, no dogs were harmed, but we have to rebuild our site using data we retrieved from the Google search index.
-We'd like to:
+This README is separated into logic sections.  It's organized in a way to explore the repository and explain the thinking along the way.
 
-- Rebuild our sitter profiles and user accounts.
-- Recreate a search ranking algorithm
-- Build an appealing search results page
+Conceptually, I tried to think of this as a single pull request. I took broad strokes and gradually refined in the best way possible in order to keep moving forward and add all of the features.  The commit ordering reflects that. I didn't squash any commits and in order to preserve how things happened. 
 
-**Please use the languages and frameworks that you feel will best show your skills. Keep in mind that if you are brought for an in-person interview, you will continue building upon this solution. Don't use this project as an opportunity to learn new frameworks or new versions of known frameworks; use what you know best so that you set yourself up for success.**
 
-The work you create here should be representative of code that we'd expect to receive from you if you were hired tomorrow.
-Our expectation is that you'll write production quality code including tests.
+## Global Dependencies
 
-We encourage you to to add a readme (or update the existing one) to help us understand your approach work and thought process...design choices, trade-offs, dependencies, etc. Please include instructions on how to setup/run your project locally.
+Python
 
-Finally, this is not a trick project, so if you have any questions, don't hesitate to ask.
+- [python3](https://www.python.org/downloads/)
 
-### When you're done with the project...
+Javascript
 
-When you're done with the project, push your work back into the repo.  Then, reply to the email you received from us letting us know you've pushed your project.  You may be tempted to email us directly, but don't do that because we rely on an applicant tracking system (ATS) to keep on top of candidates in process. Replying through it will help ensure you don't slip through the cracks.
+- [node](https://nodejs.org/en/)
+- [yarn](https://yarnpkg.com/)
+- [ember-cli](https://www.emberjs.com/)
 
-## Rebuilding Profiles
+Database
 
-We were able to write a script and scrape the Google index for all of the reviews customers have left of sitters.
-We have saved that information in the attached CSV.
-Using the information in the file, we need to design a database schema and import the data from the .csv file.
+- [PostgreSQL](https://www.postgresql.org/)
 
-**NOTE**: If a stay includes multiple dogs, those names will be included in the same column of the CSV "|" delimited.
 
-## Recreating the Search Ranking Algorithm
+## How to run project
 
-- For each sitter, we calculate Overall Sitter Rank.
-- Sitter Score is 5 times the fraction of the English alphabet comprised by the distinct letters in what we've recovered of the sitter's name.
-- Ratings Score is the average of their stay ratings.
-- The Overall Sitter Rank is a weighted average of the Sitter Score and Ratings Score, weighted by the number of stays. When a sitter has no stays, their Overall Sitter Rank is equal to the Sitter Score.  When a sitter has 10 or more stays, their Overall Sitter Rank is equal to the Ratings Score.
-- In the event that two or more sitters have the same Overall Sitter Rank, the ordering is unimportant and does not need to be handled.
+Once all above global dependencies are installed, to build the project and install all dependencies for Ember and Django, from the project home:
 
-The Overall Sitter Rank and it's score components must be kept up to date. That means whenever a relevant event happens, that could affect the Overall Sitter Rank, we need to recompute it.
+```
+# create virualenv and install pip dependencies
+cd Rover-Django
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-Think about what can make the Overall Sitter Rank change.
+# build project
+bash ../setup.sh
 
-## Building a Sitter List
+# run project
+cd ../Rover-Django/rover/
+./manage.py runserver
+```
 
-We need to display the sitters on a page in order of their *Overall Sitter Rank*. This should be easy, simply render a list of sitters.
+### Run Django tests
 
-Each row should display one sitter with their name, photo and their *Ratings Score*. We want to display just their *Ratings Score*, but sort by their *Overall Sitter Rank*. Think of the *Ratings Score* as a publicly disclosed concept and sitter attribute, and the *Overall Sitter Rank* as Rover's marketplace "secret sauce" that should remain private.
+From `Rover-Django/rover/` dir:
 
-**NOTE**: Make sure your search sorting and listing can scale well to a large number of records.
+```
+./manage.py test
+```
 
-## Filtering Sitters
+Django code coverage, From `Rover-Django/rover/` dir:
 
-Finally, we need to allow customers to filter out sitters on the page with poor average stay ratings.
-Allow users to filter out sitters whose average ratings is below a user specified value.
-It’s okay to use UI controls &mdash; sliders, checkboxes, etc &mdash; that limit the values users can enter.
+```
+coverage run --source='.' manage.py test
+coverage report
+```
 
-## Hint for Testing the Search Ranking Algorithm
-Suppose there is a sitter whose Sitter Score is 2.5 and gets rating of 5.0 with every stay. Then, their score should
-behave like:
+### Run Ember tests
 
-| Stay          | Overall Sitter Rank         |
-| ------------- | ------------- |
-| 0 | 2.50
-| 1 | 2.75
-| 2 | 3.00
-| 3 | 3.25
-| 4 | 3.50
-| 5 | 3.75
-| 6 | 4.00
-| 7 | 4.25
-| 8 | 4.50
-| 9 |  4.75
-| 10 | 5.00
-| 11 | 5.00
-| 12 | 5.00
+From `Rover-Ember/rover/` dir:
+
+```
+ember test
+```
+
+## Initial Overview
+
+### First
+
+I first took an overview of the `instructions-README.md` for all requirements and what the goals are. Then I started exploring the `reviews.csv`
+
+### Data exploration
+
+I started with exploring the data using the Python [Pandas](https://pandas.pydata.org/) library. The Jupyter notebook for this is at `notebooks/pandasy.ipynb` and can be run by:
+
+```
+# from project home
+cd notebooks
+ipython notebook
+```
+
+I was thinking that the unique key was the Owner or Sitter name. But, upon exploring the data these were the unique counts:
+
+- sitter - 100
+- sitter_email - 100
+- owner - 186
+- owner_email - 189
+
+The name `Tony L.` appeared as a Owner and Sitter.
+
+Looking at the emails, both `sitter_email` and `owner_email` where prefixed with `user<number>`. Also both were unique across regardless of being an Owner or Sitter, where as the names were not, so I took the `email` as the unique key for Owner or Sitter.
+
+Each has a Django `User` one-to-one relationship. The `email` is stored as the Django `username`, which is the only required field on the Django `User` model.
+
+I initially wrote group by's, count, average logic for calculating Sitter scores in Pandas, with the idea to write it to a CSV and upload to a database table, but I thought that this would better be in Django code, so didn't end up using it.
+
+Pandas was helpful for data exploration.
+
+### Overall Sitter Rank
+
+This will be the default page ordering.
+
+Sitter Scores must be kept up to date.
+
+Things that would change it:
+
+- new stay
+- new rating
+- change in name (optional)
+
+### Sitter List View and API Endpoint
+
+Since the main goal was to build a end-to-end List View with sort, order, and filtering logic, I wrote down what data and functionality the List View should have.
+
+Fields
+
+- id
+- name
+- photo
+- ratings score
+
+Default ordering
+
+- Overall Sitter Rank
+
+Must be able to scale
+
+- pagination or infinity scroll (I chose pagination)
+
+Filtering
+
+- min ratings_score
+- name
+
+Ordering
+
+- name
+- ratings_score
+
+Search
+
+- name
+
+I will need UI for the User to set a `min ratings score` and filter out all Users below that score
+
+Also for `name` search.
+
+Basic UI for ordering exists with the `ember-light-table` add-on, so just the component logic of what API request to call needs to be written.
+
+## Backend
+
+For the backend I used [Django](https://www.djangoproject.com/) and [django-rest-framework](http://www.django-rest-framework.org/). At my previous position, this was our API backend, so this is very familiar.
+
+I wrote out the below sketch of the apps that I wanted to have.  From the `README.md`, there was a little bit of uncertainty here because it said to design a database schema based upon the `reviews.csv`, but a full database schema isn't needed to support a single List View and API endpoint. In the end, I took it as a requirement and built out an initial schema from what was in `reviews.csv` even if it wasn't viewable by the end user.
+
+I used [django-extensions](https://github.com/django-extensions/django-extensions) for prototyping the `csv.DictReader` CSV upload to the `RawReview` table. I also used if for prototyping the Django ORM queries for counting `stays` and `sitter_scores` before putting the logic in code with tests. Sometimes I like to do this because the feedback loop is quicker depending on what it is.
+
+I used [model-mommy](https://github.com/vandersonmota/model_mommy) for some test fixtures.
+
+[isort](https://github.com/timothycrosley/isort) and [pylint](https://pypi.python.org/pypi/pylint) for sorting imports and linting files.
+
+[coverage](https://pypi.python.org/pypi/coverage) for Django code coverage checking.
+
+### Initial sketch of Django apps
+
+2 apps to start
+
+- customer
+
+	- User(Django)
+
+		- username
+		- email
+
+	- AbstractCustomer
+
+		- name
+		- phone_number
+		- image
+		- user - OneToOneField - User(Django)
+		
+	- Sitter(AbstractCustomer)
+
+		- stays
+		- ratings_score
+		- sitter_score
+		- overall_score
+
+	- Owner(AbstractCustomer)
+
+		- dogs - HStoreField ?? (w/o this field, maybe use SQLite?)
+	
+- review
+
+	- RawReview upload of `reviews.csv`
+
+	- Review
+	
+		- normalized
+		- with foreign keys to `Owner` and `Sitter`
+
+### Generating of the Scores and populating the database
+
+This logic is in the Django `models.py` files.
+
+Some thoughts about this, is that Django Manager methods are being called to do the data imports, so the logic can be in custom Manager methods. Another thought is that this represents a database `seeding` concept, and if one wanted to keep the Django Manager classes as production code only, since a database `seed` only happense once and isn't production logic, then for example a separate `seed` app could be created to encapsulate this logic. 
+
+### Testing
+
+Pretty strait forward unit tests, and end to end tests that filter logic works and returned properly sorted, filter, ordered data. Unit tests for methods and so on.
+
+### Debugging
+
+Used Python standard debugger `pdb`
+
+## Frontend
+
+I chose [EmberJs](https://www.emberjs.com/). Our app at my previous position was built with EmberJs and this is the single page app framework that I'm the most familiar with.
+
+Some hurdles that I ran into were that a lot of  internal app structure that we had we custom built and didn't use Ember 3rd partly libaries for. I used some 3rd party libraries in place of our custom logic.
+
+- Table Grid - [ember-light-table](https://github.com/offirgolan/ember-light-table)
+
+	- this is a pretty popular solution in the community and one of our EmberJs developers even said that we could have used it instead of building our own
+
+- Client data store - [Ember Data](https://github.com/emberjs/data)
+
+	- defacto EmberJs data store
+	- we used [ember-cli-simple-store](https://github.com/toranb/ember-cli-simple-store) but had to hand roll adapters, serializers and ajax logic
+
+- Fixtures - [ember-cli-mirage](https://github.com/samselikoff/ember-cli-mirage)
+
+	- defacto for EmberJs test or localhost fixtures
+	- we used static or partially dynamically generated Javascipt objects
+
+- Select box for "min ratings score" filter - [ember-power-select]()
+
+	- we used this add-on
+
+- Rating score formatting - [ember-cli-accounting](https://github.com/cibernox/ember-cli-accounting)
+
+	- we used this add-on
+	- wraps [accounting.js](http://openexchangerates.github.io/accounting.js/)
+
+
+### Styling
+
+Disclaimer, I am a backend developer. This app probably has the best styling that I've ever done. I usually use templates from [themeforest.net](https://themeforest.net/) on personal projects. One of the requirements was an appealing UI, so I did my best to do that. And also, if the UI is no good, to a certain point it doesn't matter if the backend is great because no one wants to use it right!  I didn't use a ThemeForest template because that would be bloat for a single view, and I didn't feel right about that vs. using open source Javascript, Python, libraries etc... which is different.
+
+Used [ember-boostrap](http://www.ember-bootstrap.com/) for styling and CSS grid, container.
+
+Used Rover green.
+
+Created a spinner with Rover green on [loading.io](https://loading.io/)
+
+[ember-font-awesome](https://github.com/martndemus/ember-font-awesome) for fa-icons
+
+Wrote app wide CSS and used [ember-component-css](https://github.com/ebryn/ember-component-css) for component specific CSS
+
+### Testing
+
+I wrote tests for the `start-page` and `end-page` helper function because they involved a variety of cases and math, so this was the fastest way to iterate.
+
+The `sitter-table` is end-to-end manually tested. This was the faster way to iterate on the functionality, but obvious automated tests are needed for scaling. There are some initial component and unit tests. I ran out of time here. This should be acceptance that the User clicks are generating the correct xhr requests that match what the API expects.
+
+### Debugging
+
+Used Chrome debug tools.
+
+In EmberJs used `debugger` and `assert.async()` with `qunit`
